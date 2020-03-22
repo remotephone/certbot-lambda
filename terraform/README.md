@@ -1,0 +1,1 @@
+This [repo](https://github.com/robertpeteuil/terraform-aws-certbot-cloudflare-lambda) is a great example of using lambda to update cloudflare hosted zones certificates. I don't have most of the requirements driving this, so I'm going to simply a lot of what they did for this purpose. 

@@ -1,0 +1,20 @@
+#!/bin/bash
+yum install -y zip wget tar make gcc zlib zlib-devel openssl openssl-devel
+wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
+tar -xzvf Python-3.6.1.tgz
+cd Python-3.6.1 && ./configure && make
+make install
+# Install & activate virtualenv
+cd /root
+/usr/local/bin/pip3 install virtualenv
+/usr/local/bin/virtualenv venv
+cd venv
+source venv/bin/activate
+
+# Install certbot and other needed dependencies
+pip install certbot certbot-dns-route53 raven
+
+# Zip it all up
+cd venv/lib/python3.6/site-packages
+zip -r /root/lets_encrypt.zip .
+aws s3 put /root/lets_encrypt.zip s3://<bucket_name>/certbot.zip

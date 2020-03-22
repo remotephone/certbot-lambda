@@ -1,0 +1,7 @@
+certbot_iam_policy.json
+terraform/.terraform
+**/.terraform*
+*.tfstate
+*tfstate.backup
+certbot.zip
+vars.tf
