@@ -62,6 +62,8 @@ def obtain_certs(email, domains):
 # │       ├── chain.pem
 # │       ├── fullchain.pem
 # │       └── privkey.pem
+
+
 def upload_certs(s3_bucket, s3_prefix):
     client = boto3.client("s3")
     cert_dir = os.path.join(CERTBOT_DIR, "live")
@@ -80,6 +82,11 @@ def guarded_handler():
     domains = os.environ["domains"]
     s3_bucket = os.environ["s3_bucket"]  # The S3 bucket to publish certificates
     s3_prefix = os.environ["s3_prefix"]  # The S3 key prefix to publish certificates
+    print(
+        "Requesting {} for {} and uploading to s3://{}/{}".format(
+            domains, email, s3_bucket, s3_prefix
+        )
+    )
     obtain_certs(email, domains)
     upload_certs(s3_bucket, s3_prefix)
 
