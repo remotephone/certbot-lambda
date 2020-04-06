@@ -1,0 +1,25 @@
+---
+
+- name: configure proxmox host for cert_handler cron job
+  hosts: all
+  vars:
+    your_bucket_that_is_not_public: your_bucket
+  tasks:
+
+    - name: copy certbot script to host
+      copy:
+        src: cert_handler.py
+        dest: /opt/certbot-lambda/proxmox_cert_handler/cert_handler.py
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: configure regular certificate updates
+      cron:
+        name: proxmox_cert_updater
+        weekday: "2,6"
+        minute: "0"
+        hour: "0"
+        user: root
+        job: "/usr/bin/python3 /opt/certbot-lambda/proxmox_cert_handler/cert_handler.py -b {{ your_bucket_that_is_not_public }}"
+        cron_file: proxmox_cert_updater
