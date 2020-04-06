@@ -1,7 +1,7 @@
 provider "aws" {
-  region  = "${var.aws_region}"
+  region  = var.aws_region
   version = ">= 2.12"
-  profile = "${var.profile}"
+  profile = var.profile
 }
 
 resource "random_integer" "id" {
@@ -12,14 +12,14 @@ resource "random_integer" "id" {
 resource "aws_lambda_function" "certbot_lambda_func" {
   filename      = "certbot.zip"
   function_name = "certbot_lamda-${random_integer.id.result}"
-  role          = "${aws_iam_role.lambda_cerbot_iam_role.arn}"
+  role          = aws_iam_role.lambda_cerbot_iam_role.arn
   handler       = "main.lambda_handler"
   timeout       = "720"
 
   # The filebase64sha256() function is available in Terraform 0.11.12 and later
   # For Terraform 0.11.11 and earlier, use the base64sha256() function and the file() function:
   # source_code_hash = "${base64sha256(file("lambda_function_payload.zip"))}"
-  source_code_hash = filebase64sha256("./certbot.zip")
+  source_code_hash = filebase64sha256("certbot.zip")
 
   runtime = "python3.7"
 
@@ -34,9 +34,6 @@ resource "aws_lambda_function" "certbot_lambda_func" {
 depends_on = [aws_iam_role.lambda_cerbot_iam_role]
 
 }
-
-
-
 
 
 
@@ -110,15 +107,15 @@ resource "aws_cloudwatch_event_rule" "every_15_days" {
 }
 
 resource "aws_cloudwatch_event_target" "update_certs_every_15_days" {
-    rule = "${aws_cloudwatch_event_rule.every_15_days.name}"
+    rule = aws_cloudwatch_event_rule.every_15_days.name
     target_id = "certbot_lambda_func"
-    arn = "${aws_lambda_function.certbot_lambda_func.arn}"
+    arn = aws_lambda_function.certbot_lambda_func.arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_certbot_lambda_func" {
     statement_id = "AllowExecutionFromCloudWatch"
     action = "lambda:InvokeFunction"
-    function_name = "${aws_lambda_function.certbot_lambda_func.function_name}"
+    function_name = aws_lambda_function.certbot_lambda_func.function_name
     principal = "events.amazonaws.com"
-    source_arn = "${aws_cloudwatch_event_rule.every_15_days.arn}"
+    source_arn = aws_cloudwatch_event_rule.every_15_days.arn
 }
